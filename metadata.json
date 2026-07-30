@@ -1,0 +1,10 @@
+{
+  "name": "Sistem Identifikasi Bunga Tropis",
+  "description": "Sistem Identifikasi Bunga Tropis berbasis CNN MobileNetV2 dengan antarmuka relasional ERD lengkap (Admin, Staff, Konsumen, Gambar Bunga Tropis, Hasil Identifikasi, Hasil Sinkronisasi, dan Laporan).",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
