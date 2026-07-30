@@ -55,8 +55,8 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
           {/* Banner with logo */}
           <div id="sidebar-header" className="p-6 border-b border-slate-200/80 flex items-center justify-between bg-slate-50 text-slate-800">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-emerald-50 rounded-xl border border-emerald-100/80 text-emerald-600">
-                <Flower2 className="w-5 h-5" />
+              <div className="p-1 bg-emerald-50 rounded-xl border border-emerald-100/80 overflow-hidden">
+                <img src="/src/logo.png" alt="Koriel Garden Logo" className="w-7 h-7 object-contain" />
               </div>
               <div>
                 <h1 className="text-xs font-bold tracking-wider text-slate-800 uppercase font-display">Koriel Garden</h1>
