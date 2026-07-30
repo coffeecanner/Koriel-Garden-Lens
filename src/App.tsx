@@ -1016,7 +1016,7 @@ export default function App() {
                         onClick={() => setIsInlineKonsumenFormOpen(!isInlineKonsumenFormOpen)}
                         className="text-[10px] text-emerald-600 hover:text-emerald-700 font-bold flex items-center space-x-1"
                       >
-                        <span>{isInlineKonsumenFormOpen ? "✕ Batal" : "+ Tambah Inline"}</span>
+                        <span>{isInlineKonsumenFormOpen ? "✕ Batal" : "+ Tambah Customer"}</span>
                       </button>
                     </div>
                     <select
