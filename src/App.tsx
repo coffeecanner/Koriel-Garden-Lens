@@ -86,6 +86,12 @@ export default function App() {
   const [uploadedImageBase64, setUploadedImageBase64] = useState<string>("");
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [lastIdentificationResult, setLastIdentificationResult] = useState<HasilIdentifikasiModel | null>(null);
+
+  // Inline Consumer Form & Drag & Drop States
+  const [isInlineKonsumenFormOpen, setIsInlineKonsumenFormOpen] = useState(false);
+  const [inlineNamaKonsumen, setInlineNamaKonsumen] = useState("");
+  const [inlineNoTelpKonsumen, setInlineNoTelpKonsumen] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
   
   // Detail & Edit Species State
   const [selectedSpeciesForDetail, setSelectedSpeciesForDetail] = useState<HasilSinkronisasiModel | null>(null);
@@ -620,6 +626,79 @@ export default function App() {
   };
 
   // --- UPLOAD / CAM LOGIC ---
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      triggerAlert("error", "Format berkas tidak valid! Harap unggah file foto (JPG/PNG).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUploadedImageBase64(reader.result as string);
+      triggerAlert("success", "Foto bunga tropis berhasil dimuat dan divalidasi lewat drop!");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveInlineKonsumen = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inlineNamaKonsumen.trim()) {
+      triggerAlert("error", "Nama konsumen tidak boleh kosong!");
+      return;
+    }
+    if (!inlineNoTelpKonsumen.trim()) {
+      triggerAlert("error", "Nomor telepon konsumen tidak boleh kosong!");
+      return;
+    }
+    const headers = { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    };
+    try {
+      const url = apiUrl("/api/konsumen");
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          nama_konsumen: inlineNamaKonsumen,
+          no_telp_konsumen: inlineNoTelpKonsumen,
+          id_staff: staffList[0]?.id_staff || 1
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        triggerAlert("success", "Konsumen baru berhasil didaftarkan secara inline!");
+        setInlineNamaKonsumen("");
+        setInlineNoTelpKonsumen("");
+        setIsInlineKonsumenFormOpen(false);
+        if (data && data.id_konsumen) {
+          setSelectedKonsumenId(String(data.id_konsumen));
+        }
+        fetchAllData();
+      } else {
+        const err = await res.json();
+        triggerAlert("error", err.message || "Gagal mendaftarkan konsumen.");
+      }
+    } catch {
+      triggerAlert("error", "Error koneksi.");
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -678,7 +757,7 @@ export default function App() {
     setIsCameraActive(false);
   };
 
-  // --- CNN MOBILENETV2 PREDICTION CALL ---
+  // --- CNN MOBILENETV3 PREDICTION CALL ---
   const handleIdentifyFlower = async () => {
     if (!selectedKonsumenId) {
       triggerAlert("error", "Silakan pilih nama Konsumen terlebih dahulu!");
@@ -707,7 +786,7 @@ export default function App() {
       if (res.ok) {
         const data = await res.json();
         setLastIdentificationResult(data.hasil_identifikasi);
-        triggerAlert("success", "Sistem CNN MobileNetV2 berhasil mengidentifikasi kelas bunga!");
+        triggerAlert("success", "Sistem CNN MobileNetV3 berhasil mengidentifikasi kelas bunga!");
         fetchAllData();
       } else {
         const err = await res.json();
@@ -930,7 +1009,16 @@ export default function App() {
 
                   {/* Konsumen Selector (Wajib diisi sesuai alur) */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Pilih Konsumen Pemilik Gambar *</label>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-xs font-bold text-slate-700">Pilih Konsumen Pemilik Gambar *</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsInlineKonsumenFormOpen(!isInlineKonsumenFormOpen)}
+                        className="text-[10px] text-emerald-600 hover:text-emerald-700 font-bold flex items-center space-x-1"
+                      >
+                        <span>{isInlineKonsumenFormOpen ? "✕ Batal" : "+ Tambah Inline"}</span>
+                      </button>
+                    </div>
                     <select
                       value={selectedKonsumenId}
                       onChange={(e) => setSelectedKonsumenId(e.target.value)}
@@ -943,6 +1031,52 @@ export default function App() {
                         </option>
                       ))}
                     </select>
+
+                    {isInlineKonsumenFormOpen && (
+                      <form onSubmit={handleSaveInlineKonsumen} className="mt-3 p-3 bg-emerald-50/50 border border-emerald-100 rounded-xl space-y-3">
+                        <div className="text-[11px] font-bold text-emerald-800">Pendaftaran Konsumen Baru</div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Nama Konsumen *"
+                            value={inlineNamaKonsumen}
+                            onChange={(e) => setInlineNamaKonsumen(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:border-emerald-500"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="No. Telepon / WhatsApp *"
+                            value={inlineNoTelpKonsumen}
+                            onChange={(e) => setInlineNoTelpKonsumen(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:border-emerald-500"
+                            required
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsInlineKonsumenFormOpen(false);
+                              setInlineNamaKonsumen("");
+                              setInlineNoTelpKonsumen("");
+                            }}
+                            className="p-1.5 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[10px] font-semibold"
+                          >
+                            Batal
+                          </button>
+                          <button
+                            type="submit"
+                            className="p-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-semibold"
+                          >
+                            Simpan
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
                     <p className="text-[10px] text-slate-500 mt-1">
                       Catatan: Daftarkan konsumen terlebih dahulu di menu <strong>Konsumen</strong> jika nama belum tertera.
                     </p>
@@ -982,10 +1116,19 @@ export default function App() {
                           </button>
                         </div>
                       ) : (
-                        <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center flex flex-col items-center justify-center space-y-3 bg-slate-50 hover:bg-slate-100/50 transition-colors">
-                          <Flower2 className="w-10 h-10 text-slate-400" />
+                        <div 
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                          className={`border-2 border-dashed rounded-xl p-8 text-center flex flex-col items-center justify-center space-y-3 transition-colors ${
+                            isDragging 
+                              ? "border-emerald-500 bg-emerald-50/50" 
+                              : "border-slate-300 bg-slate-50 hover:bg-slate-100/50"
+                          }`}
+                        >
+                          <Flower2 className={`w-10 h-10 transition-colors ${isDragging ? "text-emerald-500 animate-bounce" : "text-slate-400"}`} />
                           <div className="text-xs text-slate-600">
-                            Pilih foto bunga tropis dari komputer Anda atau aktifkan kamera perangkat
+                            {isDragging ? "Lepaskan gambar untuk mengunggah!" : "Pilih atau Seret (Drag & Drop) foto bunga tropis di sini, atau aktifkan kamera"}
                           </div>
                           <div className="flex space-x-2">
                             <label className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs cursor-pointer flex items-center space-x-1.5">
