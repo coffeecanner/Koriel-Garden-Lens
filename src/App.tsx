@@ -820,8 +820,8 @@ export default function App() {
 
         <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-8 shadow-xl relative z-10 text-left">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-emerald-50 border border-emerald-100/60 rounded-2xl mx-auto flex items-center justify-center text-emerald-600 mb-4 shadow-inner">
-              <Flower2 className="w-9 h-9" />
+            <div className="p-1 bg-emerald-50 rounded-xl border border-emerald-100/80 overflow-hidden">
+              <img src="/src/logo.png" alt="Koriel Garden Logo" className="w-7 h-7 object-contain" />
             </div>
             <h1 className="text-2xl font-bold font-serif tracking-tight text-slate-900">Koriel Garden</h1>
             <p className="text-xs text-slate-500 mt-1 font-sans">Sistem Identifikasi & Pelayanan Pelanggan</p>
