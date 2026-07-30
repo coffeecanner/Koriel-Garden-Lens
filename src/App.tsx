@@ -35,7 +35,14 @@ import {
   HasilIdentifikasiModel, 
   LaporanModel 
 } from "./types";
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || ""
+).replace(/\/$/, "");
 
+const apiUrl = (path: string): string => {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+};
 export default function App() {
   // Authentication & Session State
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -113,7 +120,7 @@ export default function App() {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     };
     try {
-      const res = await fetch("/api/hasil_sinkronisasi", {
+      const res = await fetch(apiUrl("/api/hasil_sinkronisasi"), {
         method: "PUT",
         headers,
         body: JSON.stringify({
@@ -161,13 +168,25 @@ export default function App() {
     const headers = { "Authorization": `Bearer ${token}` };
 
     const endpoints = [
-      { url: "/api/admin", setter: setAdminsList, name: "Admin" },
-      { url: "/api/staff", setter: setStaffList, name: "Staff" },
-      { url: "/api/konsumen", setter: setKonsumenList, name: "Konsumen" },
-      { url: "/api/gambar_bunga_tropis", setter: setGambarList, name: "Gambar" },
-      { url: "/api/hasil_identifikasi", setter: setHasilList, name: "Hasil Identifikasi" },
-      { url: "/api/hasil_sinkronisasi", setter: setSinkronisasiList, name: "Hasil Sinkronisasi" },
-      { url: "/api/laporan", setter: setLaporanList, name: "Laporan" }
+      { url: apiUrl("/api/admin"), setter: setAdminsList, name: "Admin" },
+      { url: apiUrl("/api/staff"), setter: setStaffList, name: "Staff" },
+      { url: apiUrl("/api/konsumen"), setter: setKonsumenList, name: "Konsumen" },
+      {
+        url: apiUrl("/api/gambar_bunga_tropis"),
+        setter: setGambarList,
+        name: "Gambar",
+      },
+      {
+        url: apiUrl("/api/hasil_identifikasi"),
+        setter: setHasilList,
+        name: "Hasil Identifikasi",
+      },
+      {
+        url: apiUrl("/api/hasil_sinkronisasi"),
+        setter: setSinkronisasiList,
+        name: "Hasil Sinkronisasi",
+      },
+      { url: apiUrl("/api/laporan"), setter: setLaporanList, name: "Laporan" },
     ];
 
     for (const ep of endpoints) {
@@ -212,25 +231,49 @@ export default function App() {
     e.preventDefault();
     setLoginError("");
     setIsAuthenticating(true);
-
     try {
-      const response = await fetch("/api/auth/login", {
+      const requestUrl = apiUrl("/api/auth/login");
+      console.log("Login API URL:", requestUrl);
+
+      const response = await fetch(requestUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: loginUsername, password: loginPassword })
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: loginUsername,
+          password: loginPassword,
+        }),
       });
 
+      const contentType = response.headers.get("content-type");
+      const responseData = contentType?.includes("application/json")
+        ? await response.json()
+        : { message: await response.text() };
+
       if (!response.ok) {
-        throw new Error("Kredensial username atau password salah!");
+        throw new Error(
+          responseData.message ||
+            `Login gagal. Server mengembalikan HTTP ${response.status}.`
+        );
       }
 
-      const resData = await response.json();
-      localStorage.setItem("token", resData.token);
-      localStorage.setItem("user", JSON.stringify(resData.user));
-      setCurrentUser(resData.user);
-      triggerAlert("success", `Selamat Datang, ${resData.user.name}!`);
-    } catch (err: any) {
-      setLoginError(err.message || "Gagal menghubungkan ke server.");
+      if (!responseData.token || !responseData.user) {
+        throw new Error("Respons login tidak memiliki token atau data pengguna.");
+      }
+
+      localStorage.setItem("token", responseData.token);
+      localStorage.setItem("user", JSON.stringify(responseData.user));
+
+      setCurrentUser(responseData.user);
+      triggerAlert("success", `Selamat Datang, ${responseData.user.name}!`);
+    } catch (err) {
+      console.error("Login error:", err);
+      setLoginError(
+        err instanceof Error
+          ? err.message
+          : "Gagal menghubungkan ke backend."
+      );
     } finally {
       setIsAuthenticating(false);
     }
@@ -255,7 +298,7 @@ export default function App() {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     };
     try {
-      const url = "/api/admin";
+      const url = apiUrl("/api/admin");
       const method = isEditingAdmin ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -306,7 +349,7 @@ export default function App() {
       ],
       onConfirm: async () => {
         try {
-          const res = await fetch(`/api/admin?id_admin=${id}`, {
+          const res = await fetch(apiUrl(`/api/admin?id_admin=${id}`), {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
           });
@@ -333,7 +376,7 @@ export default function App() {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     };
     try {
-      const url = "/api/staff";
+      const url = apiUrl("/api/staff");
       const method = isEditingStaff ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -381,7 +424,7 @@ export default function App() {
       ],
       onConfirm: async () => {
         try {
-          const res = await fetch(`/api/staff?id_staff=${id}`, {
+          const res = await fetch(apiUrl(`/api/staff?id_staff=${id}`), {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
           });
@@ -408,7 +451,7 @@ export default function App() {
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     };
     try {
-      const url = "/api/konsumen";
+      const url = apiUrl("/api/konsumen");
       const method = isEditingKonsumen ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -444,7 +487,7 @@ export default function App() {
       ],
       onConfirm: async () => {
         try {
-          const res = await fetch(`/api/konsumen?id_konsumen=${id}`, {
+          const res = await fetch(apiUrl(`/api/konsumen?id_konsumen=${id}`), {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
           });
@@ -471,7 +514,7 @@ export default function App() {
       // Build ISO date string representing the selected month & year
       const customDate = `${laporanTahun}-${String(laporanBulan).padStart(2, "0")}-01T00:00:00Z`;
       
-      const res = await fetch("/api/laporan", {
+      const res = await fetch(apiUrl("/api/laporan"), {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -506,7 +549,7 @@ export default function App() {
       ],
       onConfirm: async () => {
         try {
-          const res = await fetch(`/api/laporan?id_laporan=${id}`, {
+          const res = await fetch(apiUrl(`/api/laporan?id_laporan=${id}`), {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
           });
@@ -525,7 +568,7 @@ export default function App() {
   const handleDownloadLaporan = async (id_laporan: number, filename: string) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`/api/laporan/download?id_laporan=${id_laporan}`, {
+      const res = await fetch(apiUrl(`/api/laporan/download?id_laporan=${id_laporan}`), {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -560,7 +603,7 @@ export default function App() {
     };
     try {
       triggerAlert("success", "Menghubungkan ke Kaggle dataset...");
-      const res = await fetch("/api/hasil_sinkronisasi", {
+      const res = await fetch(apiUrl("/api/hasil_sinkronisasi"), {
         method: "POST",
         headers
       });
@@ -649,7 +692,7 @@ export default function App() {
     setIsIdentifying(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch("/api/predict", {
+      const res = await fetch(apiUrl("/api/predict"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
