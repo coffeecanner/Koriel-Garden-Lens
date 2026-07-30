@@ -12,7 +12,7 @@ import {
   X
 } from "lucide-react";
 import { User as UserType } from "../types";
-
+import logo from "../logo.png";
 interface SidebarProps {
   currentMenu: string;
   setCurrentMenu: (menu: string) => void;
@@ -56,7 +56,7 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
           <div id="sidebar-header" className="p-6 border-b border-slate-200/80 flex items-center justify-between bg-slate-50 text-slate-800">
             <div className="flex items-center space-x-3">
               <div className="p-1 bg-emerald-50 rounded-xl border border-emerald-100/80 overflow-hidden">
-                <img src="/src/logo.png" alt="Koriel Garden Logo" className="w-7 h-7 object-contain" />
+                <img src={logo} alt="Koriel Garden Logo" className="w-7 h-7 object-contain" />
               </div>
               <div>
                 <h1 className="text-xs font-bold tracking-wider text-slate-800 uppercase font-display">Koriel Garden</h1>
