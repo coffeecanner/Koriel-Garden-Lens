@@ -24,7 +24,7 @@ import {
   Eye,
   BookOpen
 } from "lucide-react";
-import Sidebar from "./korielsidebar";
+import Sidebar from "./components/Sidebar";
 import { 
   User, 
   AdminModel, 
