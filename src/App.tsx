@@ -38,7 +38,7 @@ import {
 const API_BASE_URL = (
   (import.meta as any).env.VITE_API_BASE_URL || ""
 ).replace(/\/$/, "");
-const logo = "/src/logo.png";
+import logo from "../logo.png";
 
 const apiUrl = (path: string): string => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
