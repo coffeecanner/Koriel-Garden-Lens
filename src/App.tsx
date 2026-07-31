@@ -24,7 +24,7 @@ import {
   Eye,
   BookOpen
 } from "lucide-react";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./korielsidebar";
 import { 
   User, 
   AdminModel, 
@@ -36,9 +36,9 @@ import {
   LaporanModel 
 } from "./types";
 const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || ""
+  (import.meta as any).env.VITE_API_BASE_URL || ""
 ).replace(/\/$/, "");
-import logo from "../logo.png";
+const logo = "/src/logo.png";
 
 const apiUrl = (path: string): string => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
