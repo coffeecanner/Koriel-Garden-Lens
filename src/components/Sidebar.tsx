@@ -11,8 +11,8 @@ import {
   Flower2,
   X
 } from "lucide-react";
-import { User as UserType } from "../types";
-import logo from "../logo.png";
+import { User as UserType } from "./src/types";
+const logo = "/src/logo.png";
 interface SidebarProps {
   currentMenu: string;
   setCurrentMenu: (menu: string) => void;
@@ -47,13 +47,13 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
 
       <aside 
         id="sidebar-container" 
-        className={`fixed inset-y-0 left-0 w-72 bg-white h-screen border-r border-slate-200/80 flex flex-col justify-between select-none z-50 transition-transform duration-300 lg:translate-x-0 lg:static lg:z-0 shrink-0 ${
+        className={`fixed inset-y-0 left-0 w-72 bg-white h-screen border-r border-slate-200/80 flex flex-col select-none z-50 transition-transform duration-300 lg:translate-x-0 lg:static lg:z-0 shrink-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div>
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Banner with logo */}
-          <div id="sidebar-header" className="p-6 border-b border-slate-200/80 flex items-center justify-between bg-slate-50 text-slate-800">
+          <div id="sidebar-header" className="p-6 border-b border-slate-200/80 flex items-center justify-between bg-slate-50 text-slate-800 shrink-0">
             <div className="flex items-center space-x-3">
               <div className="p-1 bg-emerald-50 rounded-xl border border-emerald-100/80 overflow-hidden">
                 <img src={logo} alt="Koriel Garden Logo" className="w-7 h-7 object-contain" />
@@ -77,7 +77,7 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
           </div>
 
           {/* Current logged-in role tag */}
-          <div id="user-role-badge" className="mx-4 mt-5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 flex items-center space-x-3">
+          <div id="user-role-badge" className="mx-4 mt-5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/70 flex items-center space-x-3 shrink-0">
             <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0">
               {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
             </div>
@@ -91,7 +91,7 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
           </div>
 
           {/* Navigation list */}
-          <nav id="sidebar-nav" className="p-4 space-y-1 mt-4">
+          <nav id="sidebar-nav" className="p-4 space-y-1 mt-4 flex-1 overflow-y-auto min-h-0">
             {allMenuItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentMenu === item.id;
@@ -103,7 +103,7 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
                     setCurrentMenu(item.id);
                     if (onClose) onClose();
                   }}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wide transition-all ${
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wide text-left transition-all ${
                     isActive 
                       ? "bg-emerald-600 text-white font-semibold shadow-sm shadow-emerald-600/10" 
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
@@ -114,19 +114,17 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
                 </button>
               );
             })}
-          </nav>
-        </div>
 
-        {/* Footer logout info */}
-        <div id="sidebar-footer" className="p-4 border-t border-slate-200/80">
-          <button
-            id="btn-logout"
-            onClick={onLogout}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-slate-50 text-slate-600 hover:bg-rose-50 hover:text-rose-600 border border-slate-200/80 hover:border-rose-200 rounded-xl text-xs font-semibold transition-colors"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Keluar Sistem</span>
-          </button>
+            {/* Logout item inside the sidebar menu list, positioned below Laporan */}
+            <button
+              id="menu-item-logout"
+              onClick={onLogout}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wide text-left transition-all text-slate-600 hover:bg-rose-50 hover:text-rose-600 mt-2 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 shrink-0 text-slate-400" />
+              <span>Keluar Sistem</span>
+            </button>
+          </nav>
         </div>
       </aside>
     </>
