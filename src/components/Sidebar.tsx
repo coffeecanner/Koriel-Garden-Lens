@@ -12,7 +12,7 @@ import {
   X
 } from "lucide-react";
 import { User as UserType } from "./src/types";
-const logo = "/src/logo.png";
+import logo from "../logo.png";
 interface SidebarProps {
   currentMenu: string;
   setCurrentMenu: (menu: string) => void;
