@@ -55,9 +55,9 @@ export default function Sidebar({ currentMenu, setCurrentMenu, user, onLogout, i
           {/* Banner with logo */}
           <div id="sidebar-header" className="p-6 border-b border-slate-200/80 flex items-center justify-between bg-slate-50 text-slate-800 shrink-0">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-emerald-50 rounded-xl border border-emerald-100/80 overflow-hidden flex items-center justify-center shrink-0">
-              <img src={logo} alt="Koriel Garden Logo" className="w-8 h-8 object-contain" />
-            </div>
+              <div className="w-20 h-20 bg-emerald-50 rounded-2xl border border-emerald-100/80 overflow-hidden flex items-center justify-center shrink-0">
+                <img src={logo} alt="Koriel Garden Logo" className="w-16 h-16 object-contain" />
+              </div>
               <div>
                 <h1 className="text-xs font-bold tracking-wider text-slate-800 uppercase font-display">Koriel Garden</h1>
                 <p className="text-[10px] text-emerald-600 font-medium truncate">Sistem Identifikasi Bunga</p>
