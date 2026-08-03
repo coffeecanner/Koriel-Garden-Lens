@@ -1218,13 +1218,6 @@ export default function App() {
 
                   <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                     <span className="text-[10px] text-slate-400 font-mono">Sistem Cerdas Koriel Garden</span>
-                    <button 
-                      onClick={handleTriggerSync}
-                      className="text-xs font-semibold text-emerald-700 hover:text-emerald-900 flex items-center space-x-1"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      <span>Sinkronkan Referensi Data Botani</span>
-                    </button>
                   </div>
                 </div>
 
@@ -1733,13 +1726,6 @@ export default function App() {
                       Katalog botani resmi Koriel Garden berisi spesies bunga tropis. Kelola karakteristik & cara perawatan harian tanaman hias dalam pangkalan data terpadu.
                     </p>
                   </div>
-                  <button 
-                    onClick={handleTriggerSync}
-                    className="p-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 cursor-pointer shadow-sm transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4 text-white" />
-                    <span>Sinkronisasikan Riwayat</span>
-                  </button>
                 </div>
               </div>
 
