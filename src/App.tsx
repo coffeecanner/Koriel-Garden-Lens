@@ -931,7 +931,15 @@ export default function App() {
               </div>
             )}
             <div className="text-[10px] bg-slate-50 border border-slate-200/60 py-1 px-2.5 rounded text-slate-500 font-mono">
-              2026-07-08
+              {(() => {
+                const now = new Date();
+                const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+                const jakartaDate = new Date(utc + 3600000 * 7);
+                const year = jakartaDate.getFullYear();
+                const month = String(jakartaDate.getMonth() + 1).padStart(2, '0');
+                const day = String(jakartaDate.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+              })()}
             </div>
           </div>
         </header>
